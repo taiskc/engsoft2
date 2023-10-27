@@ -4,14 +4,9 @@ const Expense = require("../models/expenseModel");
 const Category = require("../models/categoryModel");
 
 const getDateRange = (req) => {
-    let startDate = new Date(req.query.startDate);
-    let endDate = new Date(req.query.endDate)
-    if (!req.query.startDate) {
-        startDate = new Date('0000-01-01');
-    }
-    if (!req.query.endDate) {
-        endDate = new Date();
-    }
+    const startDate = req.query.startDate ? new Date(req.query.startDate) : new Date('0000-01-01');
+    const endDate = req.query.endDate ? new Date(req.query.endDate): new Date();
+    
     return { startDate, endDate };
 }
 
