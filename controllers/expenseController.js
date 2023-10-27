@@ -42,16 +42,19 @@ const getExpansesByCategoryAndDate = asyncHandler(async (categoryId, dateRange) 
     return expensesByCategoryAndDate;
 });
 
+const calculateExpensesValuesSum = (expenses) => {
+    return expenses.reduce((currentSum, expense) => {
+      return currentSum + expense.value;
+    }, 0);
+  }
+
 const getMeanValuePerCategory = asyncHandler(async (req, res) => {
     const dateRange = getDateRange(req);
     const categories = await Category.find();
-    let meanValuePerCategory = [];
+    const meanValuePerCategory = [];
     await Promise.all(categories.map(async category => {
-        let totalValue = 0;
         const expensesByDateRange = await getExpansesByCategoryAndDate(category.id, dateRange);
-        expensesByDateRange.forEach(expense => {
-            totalValue += expense.value;
-        });
+        const totalValue = calculateExpensesValuesSum(expensesByDateRange);
         const meanValue = expensesByDateRange.length > 0 ? totalValue / expensesByDateRange.length : 0;
         meanValuePerCategory.push({category: category.name, meanValue: meanValue})
     }));
@@ -61,13 +64,10 @@ const getMeanValuePerCategory = asyncHandler(async (req, res) => {
 const getTotalValuePerCategory = asyncHandler(async (req, res) => {
     const dateRange = getDateRange(req);
     const categories = await Category.find();
-    let totalValuePerCategory = [];
+    const totalValuePerCategory = [];
     await Promise.all(categories.map(async category => {
-        let totalValue = 0;
         const expensesByDateRange = await getExpansesByCategoryAndDate(category.id, dateRange);
-        expensesByDateRange.forEach(expense => {
-            totalValue += expense.value;
-        });
+        const totalValue = calculateExpensesValuesSum(expensesByDateRange);
         totalValuePerCategory.push({category: category.name, totalValue: totalValue})
     }));
     res.status(200).json(totalValuePerCategory);
