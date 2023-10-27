@@ -3,7 +3,7 @@ const asyncHandler = require("express-async-handler");
 const Expense = require("../models/expenseModel");
 const Category = require("../models/categoryModel");
 
-const getDateRange = (req) => {
+const getDateRangeFromQuery = (req) => {
     const startDate = req.query.startDate ? new Date(req.query.startDate) : new Date('0000-01-01');
     const endDate = req.query.endDate ? new Date(req.query.endDate): new Date();
     
@@ -11,7 +11,7 @@ const getDateRange = (req) => {
 }
 
 const getExpenses = asyncHandler (async (req, res) => {
-    const { startDate, endDate } = getDateRange(req);
+    const { startDate, endDate } = getDateRangeFromQuery(req);
     const expensesByDateRange = await Expense.find({
         date: {
             $gte: startDate, 
@@ -49,7 +49,7 @@ const calculateExpensesValuesSum = (expenses) => {
   }
 
 const getMeanValuePerCategory = asyncHandler(async (req, res) => {
-    const dateRange = getDateRange(req);
+    const dateRange = getDateRangeFromQuery(req);
     const categories = await Category.find();
     const meanValuePerCategory = [];
     await Promise.all(categories.map(async category => {
@@ -62,7 +62,7 @@ const getMeanValuePerCategory = asyncHandler(async (req, res) => {
 });
 
 const getTotalValuePerCategory = asyncHandler(async (req, res) => {
-    const dateRange = getDateRange(req);
+    const dateRange = getDateRangeFromQuery(req);
     const categories = await Category.find();
     const totalValuePerCategory = [];
     await Promise.all(categories.map(async category => {
