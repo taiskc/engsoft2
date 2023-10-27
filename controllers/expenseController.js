@@ -73,29 +73,26 @@ const getTotalValuePerCategory = asyncHandler(async (req, res) => {
     res.status(200).json(totalValuePerCategory);
 });
 
-const getModifiedByDaysDate = (date, days) => {
-    const startDate = new Date(date);
-    startDate.setDate(startDate.getDate() + days);
-    return startDate;
-};
-
 const monthVariationPerCategory = asyncHandler(async (req, res) => {
-    const monthDays = 30;
+    const currentMonthStartDate = new Date().setDate(new Date().getDate() - 30);
     const currentMonthEndDate = new Date();
-    const currentMonthStartDate = getModifiedByDaysDate(currentMonthEndDate, -monthDays);
-    const lastMonthEndDate = getModifiedByDaysDate(currentMonthStartDate, -1);
-    const lastMonthStartDate = getModifiedByDaysDate(lastMonthEndDate, -monthDays)
-    
+    const lastMonthStartDate = new Date().setDate(new Date().getDate() - 61);
+    const lastMonthEndDate = new Date().setDate(new Date().getDate() - 31);
     const currentMonthDateRange = { startDate: currentMonthStartDate, endDate: currentMonthEndDate }
     const lastMonthDateRange = { startDate: lastMonthStartDate, endDate: lastMonthEndDate }
-    
     const categories = await Category.find();
-    const monthVariationPerCategory = [];
+    let monthVariationPerCategory = [];
     await Promise.all(categories.map(async category => {
+        let currentMonthTotalValue = 0;
+        let lastMonthTotalValue = 0;
         const currentMonthExpenses = await getExpansesByCategoryAndDate(category.id, currentMonthDateRange);
         const lastMonthExpenses = await getExpansesByCategoryAndDate(category.id, lastMonthDateRange);
-        const currentMonthTotalValue = calculateExpensesValuesSum(currentMonthExpenses);
-        const lastMonthTotalValue = calculateExpensesValuesSum(lastMonthExpenses);
+        currentMonthExpenses.forEach(expense => {
+            currentMonthTotalValue += expense.value;
+        });
+        lastMonthExpenses.forEach(expense => {
+            lastMonthTotalValue += expense.value;
+        });
         monthVariationPerCategory.push({category: category.name, monthVariation: currentMonthTotalValue - lastMonthTotalValue});
     }));
     res.status(200).json(monthVariationPerCategory);
