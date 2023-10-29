@@ -79,7 +79,7 @@ const getModifiedByDaysDate = (date, days) => {
     return modifiedDate;
 };
 
-const monthVariationPerCategory = asyncHandler(async (req, res) => {
+const getMonthVariationPerCategory = asyncHandler(async (req, res) => {
     const monthDays = 30;
     const currentMonthEndDate = new Date();
     const currentMonthStartDate = getModifiedByDaysDate(currentMonthEndDate, -monthDays);
@@ -119,4 +119,4 @@ const deleteExpense = asyncHandler(async (req, res) => {
     res.status(201).json({ message: `Delete expense for ${req.params.id}`});
 });
 
-module.exports = { getExpenses, createExpense, getExpense, updateExpense, deleteExpense, getMeanValuePerCategory, getTotalValuePerCategory, monthVariationPerCategory };
+module.exports = { getExpenses, createExpense, getExpense, updateExpense, deleteExpense, getMeanValuePerCategory, getTotalValuePerCategory, getMonthVariationPerCategory };
